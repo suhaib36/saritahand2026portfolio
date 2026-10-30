@@ -1,46 +1,36 @@
-import React from 'react';
-import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Check, Info, X } from 'lucide-react';
 
-export function ToastContainer({ toasts, onCloseToast }) {
-  if (!toasts || toasts.length === 0) return null;
+export default function Toast({ toast, onClose }) {
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => {
+      onClose();
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [toast, onClose]);
+
+  if (!toast) return null;
 
   return (
-    <div className="toast-container">
-      {toasts.map((toast) => {
-        const isSuccess = toast.type === 'success';
-        const isError = toast.type === 'error';
-
-        return (
-          <div
-            key={toast.id}
-            className={`toast ${isSuccess ? 'toast-success' : isError ? 'toast-error' : ''}`}
-          >
-            <div style={{ flexShrink: 0 }}>
-              {isSuccess && <CheckCircle2 size={18} color="#22C55E" />}
-              {isError && <AlertCircle size={18} color="#EF4444" />}
-              {!isSuccess && !isError && <Info size={18} color="#F59E0B" />}
-            </div>
-
-            <div style={{ flex: 1, minWidth: 0 }}>
-              {toast.title && (
-                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 2 }}>
-                  {toast.title}
-                </div>
-              )}
-              <div style={{ fontSize: 12.5, opacity: 0.92, lineHeight: 1.35 }}>
-                {toast.message}
-              </div>
-            </div>
-
-            <button
-              onClick={() => onCloseToast(toast.id)}
-              style={{ color: '#A8A29E', padding: 2, display: 'flex' }}
-            >
-              <X size={14} />
-            </button>
-          </div>
-        );
-      })}
+    <div className="fixed bottom-6 right-6 z-50 max-w-md animate-fade-in-up">
+      <div className="flex items-center gap-3 bg-[#1C1917] text-[#FAF8F5] px-5 py-3.5 shadow-2xl border border-[#C5A880]/30 rounded-none">
+        {toast.type === 'info' ? (
+          <Info className="w-4 h-4 text-[#C5A880] shrink-0" />
+        ) : (
+          <Check className="w-4 h-4 text-[#C5A880] shrink-0" />
+        )}
+        <div className="text-xs font-sans tracking-wide pr-2">
+          {toast.message}
+        </div>
+        <button
+          onClick={onClose}
+          className="ml-auto text-stone-400 hover:text-white transition-colors"
+          aria-label="Close notification"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
     </div>
   );
 }

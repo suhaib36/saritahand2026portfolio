@@ -1,522 +1,251 @@
 import React, { useState, useEffect } from 'react';
-import {
-  BUSINESS_INFO,
-  INITIAL_MENU_ITEMS,
-  INITIAL_REQUESTS,
-  INITIAL_ORDERS,
-  INITIAL_NOTIFICATIONS
-} from './data/initialData';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import EnquiryModal from './components/EnquiryModal';
+import ShortlistDrawer from './components/ShortlistDrawer';
+import QuickSearchModal from './components/QuickSearchModal';
+import Toast from './components/Toast';
 
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
-import { NotificationDrawer } from './components/NotificationDrawer';
-import { ToastContainer } from './components/Toast';
-import { ConfirmDialog } from './components/ConfirmDialog';
+import HomeView from './views/HomeView';
+import CatalogueView from './views/CatalogueView';
+import ProductDetailView from './views/ProductDetailView';
+import CollectionsView from './views/CollectionsView';
+import CraftsmanshipView from './views/CraftsmanshipView';
+import ContactView from './views/ContactView';
 
-import { DashboardView } from './views/DashboardView';
-import { RequestsView } from './views/RequestsView';
-import { RequestDetailModal } from './views/RequestDetailModal';
-import { QuotationModal } from './views/QuotationModal';
-import { NewRequestModal } from './views/NewRequestModal';
-import { OrdersView } from './views/OrdersView';
-import { CalendarView } from './views/CalendarView';
-import { MenuPackagesView } from './views/MenuPackagesView';
-import { DemoWalkthroughModal } from './views/DemoWalkthroughModal';
+import { PRODUCTS_DATA } from './data/productsData';
 
 export default function App() {
-  // Navigation & UI state
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
-  const [isNewRequestModalOpen, setIsNewRequestModalOpen] = useState(false);
+  const [currentView, setCurrentView] = useState('home');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [catalogueFilters, setCatalogueFilters] = useState({});
 
-  // Active Modals & Selection
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const [quotationPreviewRequest, setQuotationPreviewRequest] = useState(null);
-  const [selectedOrderForDetail, setSelectedOrderForDetail] = useState(null);
+  // Modals & Drawers state
+  const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+  const [enquiryTargetProduct, setEnquiryTargetProduct] = useState(null);
+  const [enquiryTargetShortlist, setEnquiryTargetShortlist] = useState(null);
 
-  // Confirmation dialog state
-  const [confirmState, setConfirmState] = useState({
-    isOpen: false,
-    title: '',
-    message: '',
-    confirmLabel: 'Confirm',
-    isDestructive: true,
-    onConfirm: () => {}
-  });
+  const [shortlistDrawerOpen, setShortlistDrawerOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [toast, setToast] = useState(null);
 
-  // Toasts
-  const [toasts, setToasts] = useState([]);
-
-  const addToast = (message, title = '', type = 'success') => {
-    const id = Date.now() + Math.random();
-    setToasts((prev) => [...prev, { id, title, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4500);
-  };
-
-  const removeToast = (id) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
-
-  // Persistent Client State (LocalStorage)
-  const [requests, setRequests] = useState(() => {
+  // Shortlist state persisted in localStorage
+  const [shortlist, setShortlist] = useState(() => {
     try {
-      const saved = localStorage.getItem('hm_catering_requests');
-      return saved ? JSON.parse(saved) : INITIAL_REQUESTS;
+      const saved = localStorage.getItem('sarita_handa_shortlist');
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return INITIAL_REQUESTS;
+      return [];
     }
   });
-
-  const [orders, setOrders] = useState(() => {
-    try {
-      const saved = localStorage.getItem('hm_catering_orders');
-      return saved ? JSON.parse(saved) : INITIAL_ORDERS;
-    } catch {
-      return INITIAL_ORDERS;
-    }
-  });
-
-  const [menuItems, setMenuItems] = useState(() => {
-    try {
-      const saved = localStorage.getItem('hm_catering_menu');
-      return saved ? JSON.parse(saved) : INITIAL_MENU_ITEMS;
-    } catch {
-      return INITIAL_MENU_ITEMS;
-    }
-  });
-
-  const [notifications, setNotifications] = useState(() => {
-    try {
-      const saved = localStorage.getItem('hm_catering_notifications');
-      return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
-    } catch {
-      return INITIAL_NOTIFICATIONS;
-    }
-  });
-
-  // Save changes to localStorage
-  useEffect(() => {
-    localStorage.setItem('hm_catering_requests', JSON.stringify(requests));
-  }, [requests]);
 
   useEffect(() => {
-    localStorage.setItem('hm_catering_orders', JSON.stringify(orders));
-  }, [orders]);
-
-  useEffect(() => {
-    localStorage.setItem('hm_catering_menu', JSON.stringify(menuItems));
-  }, [menuItems]);
-
-  useEffect(() => {
-    localStorage.setItem('hm_catering_notifications', JSON.stringify(notifications));
-  }, [notifications]);
-
-  // Request Actions
-  const handleSaveRequest = (updatedRequest) => {
-    setRequests((prev) =>
-      prev.map((r) => (r.id === updatedRequest.id ? updatedRequest : r))
-    );
-    setSelectedRequest(null);
-    addToast(
-      `Catering request for ${updatedRequest.customerName} updated successfully.`,
-      'Changes Saved',
-      'success'
-    );
-  };
-
-  const handleCreateNewRequest = (newRequest) => {
-    setRequests((prev) => [newRequest, ...prev]);
-    addToast(
-      `Inquiry ${newRequest.id} for ${newRequest.customerName} recorded.`,
-      'New Request Created',
-      'success'
-    );
-  };
-
-  const handleOpenQuotationPreview = (req) => {
-    setQuotationPreviewRequest(req);
-  };
-
-  const handleSendQuote = (requestId) => {
-    const todayStr = new Date().toISOString().split('T')[0];
-    setRequests((prev) =>
-      prev.map((r) => {
-        if (r.id === requestId) {
-          return {
-            ...r,
-            status: 'Quote Sent',
-            quoteSentDate: todayStr
-          };
-        }
-        return r;
-      })
-    );
-    if (selectedRequest && selectedRequest.id === requestId) {
-      setSelectedRequest((prev) => ({
-        ...prev,
-        status: 'Quote Sent',
-        quoteSentDate: todayStr
-      }));
+    try {
+      localStorage.setItem('sarita_handa_shortlist', JSON.stringify(shortlist));
+    } catch {
+      // ignore
     }
-    setQuotationPreviewRequest(null);
-    addToast(
-      `Estimate delivered to customer. Status transitioned to Quote Sent.`,
-      'Quotation Sent',
-      'success'
-    );
+  }, [shortlist]);
+
+  // Dynamic document title
+  useEffect(() => {
+    const titles = {
+      home: 'Sarita Handa | Luxury Home Furnishings & Bespoke Textiles',
+      catalogue: 'Portfolio Catalogue | Sarita Handa Handcrafted Linens & Furniture',
+      'product-detail': selectedProduct
+        ? `${selectedProduct.name} | Sarita Handa`
+        : 'Product Details | Sarita Handa',
+      collections: 'Signature Collections Lookbook | Sarita Handa',
+      about: 'The Art of the Needle & Heritage Craftsmanship | Sarita Handa',
+      contact: 'Flagship Showrooms & Client Concierge | Sarita Handa',
+    };
+    document.title = titles[currentView] || 'Sarita Handa | Luxury Living';
+  }, [currentView, selectedProduct]);
+
+  // Scroll to top on view change
+  const navigateTo = (view, param = null) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (view === 'product-detail' && param) {
+      setSelectedProduct(param);
+      setCurrentView('product-detail');
+      return;
+    }
+
+    if (view === 'catalogue') {
+      if (param) {
+        setCatalogueFilters(param);
+      } else {
+        setCatalogueFilters({});
+      }
+      setCurrentView('catalogue');
+      return;
+    }
+
+    setCurrentView(view);
   };
 
-  // Marking a request as Confirmed -> automatically generates an Order!
-  const handleMarkConfirmed = (req) => {
-    setConfirmState({
-      isOpen: true,
-      title: 'Confirm Event & Book Order?',
-      message: `Are you sure you want to confirm ${req.customerName}'s event for ${req.eventDate}? This will generate a kitchen order and reserve smoker capacity.`,
-      confirmLabel: 'Confirm & Create Order',
-      isDestructive: false,
-      onConfirm: () => {
-        const orderNumber = `ORD-2026-${req.id.replace('REQ-2026-', '')}`;
-        const todayStr = new Date().toISOString().split('T')[0];
+  // Toast helper
+  const showToast = (toastObj) => {
+    setToast(toastObj);
+  };
 
-        // Format menu items for order
-        const orderItems = (req.selectedItems || []).map((i) => ({
-          name: i.name,
-          quantity: i.quantity,
-          price: i.price,
-          total: Number(i.quantity) * Number(i.price)
-        }));
-
-        const newOrder = {
-          id: orderNumber,
-          orderNumber,
-          requestId: req.id,
-          customerName: req.customerName,
-          organization: req.organization,
-          email: req.email,
-          phone: req.phone,
-          eventType: req.eventType,
-          eventDate: req.eventDate,
-          preferredTime: req.preferredTime,
-          guestCount: req.guestCount,
-          venueAddress: req.venueAddress,
-          subtotal: req.subtotal || 0,
-          deliveryFee: req.deliveryFee || 0,
-          staffingFee: req.staffingFee || 0,
-          taxRate: req.taxRate || BUSINESS_INFO.taxRate,
-          taxAmount: req.taxAmount || 0,
-          totalValue: req.totalValue || req.estimatedBudget || 0,
-          preparationStatus: 'Not Started',
-          paymentStatus: 'Deposit Received',
-          dateConfirmed: todayStr,
-          items: orderItems,
-          dietaryNotes: req.dietaryNotes,
-          specialInstructions: req.specialInstructions,
-          kitchenChecklist: [
-            { step: 'Order verified & meat cuts reserved in walk-in cooler', done: true },
-            { step: 'Schedule pitmaster smoking shift & wood restock', done: false },
-            { step: 'Sides & sauce prep underway', done: false },
-            { step: 'Load catering hot boxes & chafers for delivery', done: false }
-          ],
-          notes: `Confirmed from request ${req.id} on ${todayStr}.`
-        };
-
-        // Update request status
-        setRequests((prev) =>
-          prev.map((r) => (r.id === req.id ? { ...r, status: 'Confirmed', confirmedDate: todayStr } : r))
-        );
-
-        // Add or replace in orders
-        setOrders((prev) => {
-          const exists = prev.some((o) => o.orderNumber === orderNumber);
-          return exists ? prev.map((o) => (o.orderNumber === orderNumber ? newOrder : o)) : [newOrder, ...prev];
+  // Shortlist handlers
+  const handleToggleShortlist = (product) => {
+    setShortlist((prev) => {
+      const exists = prev.some((item) => item.id === product.id);
+      if (exists) {
+        showToast({
+          type: 'info',
+          message: `Removed "${product.name}" from your shortlist.`,
         });
-
-        setSelectedRequest(null);
-        setConfirmState((prev) => ({ ...prev, isOpen: false }));
-
-        addToast(
-          `Event confirmed! Order ${orderNumber} created with Deposit Received status.`,
-          'Order Confirmed',
-          'success'
-        );
+        return prev.filter((item) => item.id !== product.id);
+      } else {
+        showToast({
+          type: 'success',
+          message: `Added "${product.name}" to your curated shortlist.`,
+        });
+        return [...prev, product];
       }
     });
   };
 
-  const handleCancelRequest = (requestId) => {
-    setConfirmState({
-      isOpen: true,
-      title: 'Decline Catering Request?',
-      message: 'Are you sure you want to decline this inquiry? The customer status will be set to Declined.',
-      confirmLabel: 'Decline Request',
-      isDestructive: true,
-      onConfirm: () => {
-        setRequests((prev) =>
-          prev.map((r) => (r.id === requestId ? { ...r, status: 'Declined' } : r))
-        );
-        setSelectedRequest(null);
-        setConfirmState((prev) => ({ ...prev, isOpen: false }));
-        addToast('Request status updated to Declined.', 'Request Cancelled', 'error');
-      }
+  const handleRemoveFromShortlist = (productId) => {
+    setShortlist((prev) => prev.filter((item) => item.id !== productId));
+  };
+
+  const handleClearShortlist = () => {
+    setShortlist([]);
+    showToast({
+      type: 'info',
+      message: 'Shortlist cleared.',
     });
   };
 
-  // Orders Actions
-  const handleUpdateOrderStatus = (orderId, updates) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, ...updates } : o))
-    );
-    addToast('Order status updated.', 'Order Updated', 'success');
+  // Enquiry Modal triggers
+  const handleOpenProductEnquiry = (product) => {
+    setEnquiryTargetProduct(product);
+    setEnquiryTargetShortlist(null);
+    setEnquiryModalOpen(true);
   };
 
-  const handleUpdateOrderChecklist = (orderId, stepIdx) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id === orderId) {
-          const updatedChecklist = [...o.kitchenChecklist];
-          updatedChecklist[stepIdx] = {
-            ...updatedChecklist[stepIdx],
-            done: !updatedChecklist[stepIdx].done
-          };
-          return { ...o, kitchenChecklist: updatedChecklist };
-        }
-        return o;
-      })
-    );
+  const handleOpenShortlistEnquiry = (shortlistItems) => {
+    setEnquiryTargetProduct(null);
+    setEnquiryTargetShortlist(shortlistItems);
+    setEnquiryModalOpen(true);
   };
 
-  // Menu Actions
-  const handleAddMenuItem = (newItem) => {
-    setMenuItems((prev) => [newItem, ...prev]);
-    addToast(`${newItem.name} added to catering menu.`, 'Menu Item Added', 'success');
-  };
-
-  const handleUpdateMenuItem = (updatedItem) => {
-    setMenuItems((prev) =>
-      prev.map((m) => (m.id === updatedItem.id ? updatedItem : m))
-    );
-    addToast(`${updatedItem.name} updated.`, 'Menu Item Updated', 'success');
-  };
-
-  const handleToggleActiveItem = (itemId) => {
-    setMenuItems((prev) =>
-      prev.map((m) => (m.id === itemId ? { ...m, active: !m.active } : m))
-    );
-  };
-
-  // Reset Data to Pristine State
-  const handleResetData = () => {
-    setConfirmState({
-      isOpen: true,
-      title: 'Reset Demo Data to Initial State?',
-      message: 'This will restore all sample inquiries, confirmed orders, and menu items to their original demonstration state.',
-      confirmLabel: 'Reset Data',
-      isDestructive: true,
-      onConfirm: () => {
-        localStorage.removeItem('hm_catering_requests');
-        localStorage.removeItem('hm_catering_orders');
-        localStorage.removeItem('hm_catering_menu');
-        localStorage.removeItem('hm_catering_notifications');
-
-        setRequests(INITIAL_REQUESTS);
-        setOrders(INITIAL_ORDERS);
-        setMenuItems(INITIAL_MENU_ITEMS);
-        setNotifications(INITIAL_NOTIFICATIONS);
-
-        setConfirmState((prev) => ({ ...prev, isOpen: false }));
-        addToast('Sample data reset to original demo state.', 'System Reset', 'success');
-      }
-    });
-  };
-
-  // 100-Guest Demo Scenario Shortcuts
-  const demoTargetRequest = requests.find((r) => r.id === 'REQ-2026-042') || requests[0];
-
-  const handleOpenDemoRequest = (openQuoteDirectly = false) => {
-    if (openQuoteDirectly) {
-      setQuotationPreviewRequest(demoTargetRequest);
-    } else {
-      setSelectedRequest(demoTargetRequest);
-    }
-  };
-
-  const handleDismissNotification = (id) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  const handleOpenGeneralEnquiry = () => {
+    setEnquiryTargetProduct(null);
+    setEnquiryTargetShortlist(null);
+    setEnquiryModalOpen(true);
   };
 
   return (
-    <div className="app-layout">
-      {/* Sidebar Navigation */}
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        collapsed={sidebarCollapsed}
-        setCollapsed={setSidebarCollapsed}
-        mobileOpen={mobileMenuOpen}
-        setMobileOpen={setMobileMenuOpen}
-        requestsCount={requests.filter((r) => r.status === 'New' || r.status === 'Reviewing').length}
-        activeOrdersCount={orders.filter((o) => o.preparationStatus !== 'Completed').length}
-        onOpenNewRequest={() => setIsNewRequestModalOpen(true)}
-        onStartDemo={() => setIsDemoModalOpen(true)}
+    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-stone-900 selection:bg-[#C5A880]/30 selection:text-stone-900 font-sans">
+      {/* Global Navigation Bar */}
+      <Navbar
+        currentView={currentView}
+        onNavigate={navigateTo}
+        shortlistCount={shortlist.length}
+        onOpenShortlist={() => setShortlistDrawerOpen(true)}
+        onOpenSearch={() => setSearchModalOpen(true)}
+        onOpenEnquiry={handleOpenGeneralEnquiry}
       />
 
-      {/* Main Viewport */}
-      <div className="main-viewport">
-        {/* App Header */}
-        <Header
-          activeTab={activeTab}
-          onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
-          notifications={notifications}
-          onOpenNotifications={() => setIsNotificationOpen(true)}
-          onStartDemo={() => setIsDemoModalOpen(true)}
-          onResetData={handleResetData}
-        />
+      {/* Main Content Area */}
+      <main className="flex-1">
+        {currentView === 'home' && (
+          <HomeView
+            onNavigate={navigateTo}
+            onViewProduct={(p) => navigateTo('product-detail', p)}
+            onEnquireProduct={handleOpenProductEnquiry}
+            shortlist={shortlist}
+            onToggleShortlist={handleToggleShortlist}
+          />
+        )}
 
-        {/* Scrollable View Content */}
-        <main className="content-scrollable">
-          {activeTab === 'dashboard' && (
-            <DashboardView
-              requests={requests}
-              orders={orders}
-              notifications={notifications}
-              onOpenRequest={(req) => setSelectedRequest(req)}
-              onOpenOrder={(ord) => {
-                setSelectedOrderForDetail(ord);
-                setActiveTab('orders');
-              }}
-              onOpenNewRequest={() => setIsNewRequestModalOpen(true)}
-              onStartDemo={() => setIsDemoModalOpen(true)}
-              onNavigateTab={(tab) => setActiveTab(tab)}
-            />
-          )}
+        {currentView === 'catalogue' && (
+          <CatalogueView
+            initialFilters={catalogueFilters}
+            onNavigate={navigateTo}
+            onViewProduct={(p) => navigateTo('product-detail', p)}
+            onEnquireProduct={handleOpenProductEnquiry}
+            shortlist={shortlist}
+            onToggleShortlist={handleToggleShortlist}
+          />
+        )}
 
-          {activeTab === 'requests' && (
-            <RequestsView
-              requests={requests}
-              onOpenRequest={(req) => setSelectedRequest(req)}
-              onOpenNewRequest={() => setIsNewRequestModalOpen(true)}
-              onOpenQuotationPreview={(req) => setQuotationPreviewRequest(req)}
-              onMarkConfirmed={(req) => handleMarkConfirmed(req)}
-            />
-          )}
+        {currentView === 'product-detail' && (
+          <ProductDetailView
+            product={selectedProduct || PRODUCTS_DATA[0]}
+            onNavigate={navigateTo}
+            onViewProduct={(p) => navigateTo('product-detail', p)}
+            onEnquireProduct={handleOpenProductEnquiry}
+            shortlist={shortlist}
+            onToggleShortlist={handleToggleShortlist}
+            onShowToast={showToast}
+          />
+        )}
 
-          {activeTab === 'orders' && (
-            <OrdersView
-              orders={orders}
-              selectedOrder={selectedOrderForDetail}
-              setSelectedOrder={setSelectedOrderForDetail}
-              onUpdateOrderStatus={handleUpdateOrderStatus}
-              onUpdateOrderChecklist={handleUpdateOrderChecklist}
-            />
-          )}
+        {currentView === 'collections' && (
+          <CollectionsView
+            onNavigate={navigateTo}
+            onEnquire={(item) => handleOpenProductEnquiry(item)}
+          />
+        )}
 
-          {activeTab === 'calendar' && (
-            <CalendarView
-              requests={requests}
-              orders={orders}
-              onOpenRequest={(req) => setSelectedRequest(req)}
-              onOpenOrder={(ord) => {
-                setSelectedOrderForDetail(ord);
-                setActiveTab('orders');
-              }}
-            />
-          )}
+        {currentView === 'about' && (
+          <CraftsmanshipView
+            onNavigate={navigateTo}
+            onEnquire={(item) => handleOpenProductEnquiry(item)}
+          />
+        )}
 
-          {activeTab === 'menu' && (
-            <MenuPackagesView
-              menuItems={menuItems}
-              onAddMenuItem={handleAddMenuItem}
-              onUpdateMenuItem={handleUpdateMenuItem}
-              onToggleActiveItem={handleToggleActiveItem}
-              onResetMenu={handleResetData}
-            />
-          )}
-        </main>
-      </div>
+        {currentView === 'contact' && (
+          <ContactView
+            onNavigate={navigateTo}
+            onShowToast={showToast}
+          />
+        )}
+      </main>
 
-      {/* Modals & Overlays */}
-      {/* 1. Request Details & Quotation Builder */}
-      {selectedRequest && (
-        <RequestDetailModal
-          isOpen={Boolean(selectedRequest)}
-          onClose={() => setSelectedRequest(null)}
-          request={selectedRequest}
-          menuItems={menuItems}
-          onSaveRequest={handleSaveRequest}
-          onOpenQuotationPreview={(req) => setQuotationPreviewRequest(req)}
-          onMarkConfirmed={(req) => handleMarkConfirmed(req)}
-          onCancelRequest={(id) => handleCancelRequest(id)}
-        />
-      )}
-
-      {/* 2. Official Quotation Preview */}
-      {quotationPreviewRequest && (
-        <QuotationModal
-          isOpen={Boolean(quotationPreviewRequest)}
-          onClose={() => setQuotationPreviewRequest(null)}
-          request={quotationPreviewRequest}
-          onSendQuote={handleSendQuote}
-          onCopyQuote={() => addToast('Quotation text copied to clipboard.', 'Copied', 'success')}
-        />
-      )}
-
-      {/* 3. New Request Modal */}
-      <NewRequestModal
-        isOpen={isNewRequestModalOpen}
-        onClose={() => setIsNewRequestModalOpen(false)}
-        onSubmitNewRequest={handleCreateNewRequest}
-        menuItems={menuItems}
+      {/* Global Luxury Footer */}
+      <Footer
+        onNavigate={navigateTo}
+        onOpenEnquiry={handleOpenGeneralEnquiry}
       />
 
-      {/* 4. Sales Demo Walkthrough Modal */}
-      <DemoWalkthroughModal
-        isOpen={isDemoModalOpen}
-        onClose={() => setIsDemoModalOpen(false)}
-        demoRequest={demoTargetRequest}
-        onOpenDemoRequest={handleOpenDemoRequest}
-        onSimulateQuoteSent={(id) => handleSendQuote(id)}
-        onSimulateConfirmOrder={(req) => handleMarkConfirmed(req)}
-        onGoToOrders={() => setActiveTab('orders')}
-        onGoToCalendar={() => setActiveTab('calendar')}
+      {/* Enquiry Modal */}
+      <EnquiryModal
+        isOpen={enquiryModalOpen}
+        onClose={() => setEnquiryModalOpen(false)}
+        product={enquiryTargetProduct}
+        shortlist={enquiryTargetShortlist}
       />
 
-      {/* 5. Notification Drawer */}
-      <NotificationDrawer
-        isOpen={isNotificationOpen}
-        onClose={() => setIsNotificationOpen(false)}
-        notifications={notifications}
-        onSelectRequest={(reqId) => {
-          const req = requests.find((r) => r.id === reqId);
-          if (req) setSelectedRequest(req);
-        }}
-        onSelectOrder={(ordId) => {
-          const ord = orders.find((o) => o.id === ordId);
-          if (ord) {
-            setSelectedOrderForDetail(ord);
-            setActiveTab('orders');
-          }
-        }}
-        onDismissNotification={handleDismissNotification}
+      {/* Curated Shortlist Drawer */}
+      <ShortlistDrawer
+        isOpen={shortlistDrawerOpen}
+        onClose={() => setShortlistDrawerOpen(false)}
+        shortlist={shortlist}
+        onRemoveItem={handleRemoveFromShortlist}
+        onClearAll={handleClearShortlist}
+        onViewProduct={(p) => navigateTo('product-detail', p)}
+        onEnquireAll={handleOpenShortlistEnquiry}
       />
 
-      {/* 6. Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={confirmState.isOpen}
-        title={confirmState.title}
-        message={confirmState.message}
-        confirmLabel={confirmState.confirmLabel}
-        isDestructive={confirmState.isDestructive}
-        onConfirm={confirmState.onConfirm}
-        onCancel={() => setConfirmState((prev) => ({ ...prev, isOpen: false }))}
+      {/* Quick Search Modal */}
+      <QuickSearchModal
+        isOpen={searchModalOpen}
+        onClose={() => setSearchModalOpen(false)}
+        products={PRODUCTS_DATA}
+        onSelectProduct={(p) => navigateTo('product-detail', p)}
+        onViewAllResults={(query) => navigateTo('catalogue', { query })}
       />
 
-      {/* 7. Toast Alerts Container */}
-      <ToastContainer toasts={toasts} onCloseToast={removeToast} />
+      {/* Global Toast */}
+      <Toast toast={toast} onClose={() => setToast(null)} />
     </div>
   );
 }

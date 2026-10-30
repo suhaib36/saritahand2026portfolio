@@ -1,132 +1,127 @@
-# H&M Catering Order Manager
+# Sarita Handa – Luxury Product Portfolio & Design Concierge
 
-A modern, professional frontend-only web application prototype designed for **H&M Meats & Catering** ([hmmeats.com](https://www.hmmeats.com)), a celebrated custom meat shop, BBQ smokehouse, and premier catering business based in **Nampa, Idaho** (Est. 1963).
-
----
-
-## 1. Project Objective & Context
-
-This prototype demonstrates how **H&M Meats & Catering** can modernize and streamline its catering sales workflow—consolidating incoming inquiries, menu selections, quotation drafting, and confirmed kitchen orders in one unified system.
-
-> **Note:** This is a dedicated business application prototype for the sales and kitchen catering team, **not** a redesign of the public marketing website.
-
-### Company Profile
-* **Business:** H&M Meats and Catering LLC
-* **Location:** 215 14th Ave S, Nampa, ID 83651
-* **Service Area:** Nampa, Caldwell, Boise, Meridian, and the greater Treasure Valley
-* **Specialties:** Slow-smoked beef brisket, Berkshire pulled pork, tri-tip, scratch-made sides, grazing tables, and on-site whole hog luaus
-* **Contact:** (208) 467-0999 | info@hmmeats.com | [hmmeats.com](https://www.hmmeats.com)
+A premium, modern luxury product portfolio website for **Sarita Handa** (inspired by [saritahanda.com](https://saritahanda.com/)), celebrating over 30 years of master Indian needlecraft, heritage textiles, European washed flax linens, and handcrafted teak furniture.
 
 ---
 
-## 2. Main Application Modules
+## 🏛️ Brand Essence & Visual Language
 
-1. **Dashboard Overview**
-   * Key operational metric cards:
-     * *New Catering Requests* (with pending review badge)
-     * *Quotes Awaiting Response* (with potential pipeline revenue)
-     * *Confirmed Upcoming Events* (with scheduled queue status)
-     * *Events This Month* (with total booked revenue)
-   * **Recent Requests Table** with customer name, event type, date, guest count, estimated value, and status actions.
-   * **Upcoming Events Feed** showing event time, location, guest count, and kitchen preparation stages.
-   * **Follow-up Reminders Panel** detailing inquiries awaiting quotes, quotes awaiting client responses, and overnight smoker shifts.
-   * **Quick 100-Guest Demo Scenario Banner** for instant sales presentations.
-
-2. **Catering Requests Pipeline**
-   * Multi-criteria search (name, email, phone, venue)
-   * Status filter chips: `All`, `New`, `Reviewing`, `Quote Sent`, `Confirmed`, `Declined`
-   * Event type filter: `Wedding`, `Corporate Event`, `Private Party`, `Other`
-   * Sorters: Newest inquiries, event date (soonest), guest count (high to low), budget (high to low)
-   * Toggle between structured **Table View** and **Detailed Cards View**
-   * Prominent **+ New Catering Request** button with comprehensive intake form
-
-3. **Request Details & Quotation Builder**
-   * Customer and contact details (editable)
-   * Event specifications: venue address, date, service window, guest count
-   * Live **Menu Selection & Cost Estimator**:
-     * Add smoked meats, sides, desserts, and packages directly from the catalog
-     * Portion steppers and quantity adjustments
-     * Auto-calculated food subtotal
-     * Delivery, chafers & setup fee controls
-     * On-site pitmaster carving & staffing fee controls
-     * Idaho State Sales Tax calculation (defaults to 6.0%, editable)
-     * Live grand estimate total
-   * Special dietary requirements & allergen notes (e.g., gluten-free, dairy-free)
-   * Event logistics, smoker arrival timeline, and internal team notes
-   * One-click actions:
-     * **Quotation Preview:** Generates a formal, printable catering proposal with H&M branding, itemized table, and booking terms
-     * **Send Quote:** Transitions request to `Quote Sent` status
-     * **Mark as Confirmed:** Automatically creates an active order in the kitchen prep queue
-     * **Decline Request:** Confirmation-gated cancellation
-
-4. **Confirmed Orders & Kitchen Preparation Queue**
-   * Order tracker displaying: Order # (`ORD-2026-xxx`), customer name, event date, guest count, order value, prep stage, and payment status
-   * Kitchen preparation stages: `Not Started`, `In Preparation`, `Ready`, `Completed`
-   * Payment status tracker: `Unpaid`, `Deposit Received`, `Paid`
-   * Order detail drawer with packing slip, ingredient requirements, and interactive **Kitchen & Smoker Prep Checklist**
-   * Clean printable kitchen prep sheet (`@media print`)
-
-5. **Event Schedule & Calendar**
-   * Interactive monthly calendar grid with month navigation and **Today** shortcut
-   * Visual distinction between **Tentative Inquiries** (amber dashed outline) and **Confirmed Orders** (solid crimson/green badges)
-   * Clickable events with detail popover modal
-   * Toggle between **Month Grid** and **Agenda List** views
-
-6. **Menu Catalog & Catering Packages**
-   * Categorized catalog: *BBQ Meats*, *Side Dishes*, *Desserts*, *Catering Packages*
-   * Real published menu items from H&M Meats (Smoked Brisket, Pulled Pork, Tri-Tip, Mac 'n Cheese, Cowboy Beans, Cast-Iron Cornbread, Peach Cobbler, Street Taco Bar, Whole Pig Luau)
-   * Active/Inactive availability toggles
-   * Add new custom catering items
-   * Edit item prices, units, and descriptions
+- **Editorial Luxury Aesthetic**: Warm alabaster (`#FAF8F5`), raw oat & sand (`#E8DED0`), terracotta clay (`#A2644B`), antique sage (`#5E6B5D`), and antique brass accents (`#C5A880`) paired with deep charcoal (`#1C1917`).
+- **Refined Typography**: Editorial serif headings (`Cormorant Garamond`), crisp tracked navigation labels, and clean modern body typography (`Plus Jakarta Sans`).
+- **High-Resolution Photography**: Diverse, realistic photography across all product categories without generic placeholders.
 
 ---
 
-## 3. The 100-Guest BBQ Sales Demonstration Scenario
+## ✨ Key Features
 
-To showcase how intuitive the system is during a live demonstration, the prototype includes a built-in interactive walkthrough accessible via the **"100-Guest Demo Scenario"** button in the header and sidebar.
+### 1. Editorial Homepage
+- **Full-Width Hero Section**: Dynamic showcase with luxury carousel highlighting seasonal collections (*The Autumn Atelier*, *Heritage Suzani Heirlooms*, *Artisanal Teak & Cane*).
+- **Brand Introduction & Heritage Pillars**: Honoring craft preservation, pure natural fibres, and bespoke residential concierge.
+- **Featured Product Collections**: Visual lookbook cards directing visitors to curated thematic lines.
+- **Popular Categories**: Direct visual access to all 9 product categories.
+- **Curated Featured Products Grid**: Best-sellers with interactive hover effects, badges, quick view, and enquire shortcuts.
+- **"Living with Sarita Handa"**: Editorial magazine vignettes showing styled interior spaces.
+- **The Art of the Needle**: Educational section on signature techniques (*The French Knot*, *Kashmiri Aari Hook*, *Kantha Running Stitch*, *Suzani Rosettes*).
+- **Bespoke Enquiry Call-to-Action**: High-visibility invitation to collaborate with the design concierge.
+- **Premium Footer**: Complete showroom directory, direct concierge contact, and brand manifesto.
 
-### Scenario Details:
-* **Customer:** Marcus Miller (*Miller Family 50th Reunion*)
-* **Event:** Private Party for **100 Guests** on November 7, 2026
-* **Location:** *Still Water Hollow*, 18120 Dean Ln, Nampa, ID
-* **Menu Preferences:** Smoked Beef Brisket, Applewood Pulled Pork, Smokehouse Mac 'n Cheese, Cowboy BBQ Beans, and Fresh Skillet Cornbread
+### 2. Complete Product Catalogue & Instant Filtering
+- **9 Core Categories**:
+  1. Cushions (French knot medallions, Aari crewelwork, silk velvet)
+  2. Bed Linen (Vintage washed European flax, 500 TC Giza Egyptian cotton)
+  3. Quilts (Reversible Suzani heirlooms, hand-block Kantha coverlets)
+  4. Duvet Covers (Scalloped border linens, architectural matelassé)
+  5. Table Linen (Embroidered runners, scalloped napkin sets)
+  6. Drapes (Gossamer linen sheers, heavy blackout velvet curtains)
+  7. Furniture (Solid Teak & handwoven cane chairs, fluted Sheesham credenzas)
+  8. Home Accessories (Hand-carved alabaster vessels, sand-cast brass candelabras)
+  9. Kids' Collection (GOTS-certified organic cotton nursery cushions & cot quilts)
+- **Instant Frontend Filtering & Search**:
+  - Filter by Category
+  - Filter by Collection
+  - Filter by Color Palette (with visual swatch dots)
+  - Filter by Material (Flax Linen, Cotton, Velvet, Wool, Teak, Stone)
+  - Live Search by product name, fabric, or technique
+  - Sorting by Featured, Newest, Name (A–Z), Name (Z–A)
+  - Active filter badges with one-click individual dismissal & "Clear All"
+  - Responsive mobile filter drawer
 
-### 7-Step Demonstration Flow:
-1. **Open Incoming Request:** Click on `REQ-2026-042` from the dashboard or requests table.
-2. **Review Specifications:** Note the 100 guests, 2-hour smoker arrival lead time, and gluten-free accommodations.
-3. **Select Menu Items & Quantities:** Verify the auto-scaled 100-serving portions.
-4. **Prepare Quotation:** Review the automatic subtotal, delivery, staffing, and 6% Idaho sales tax. Open the clean printable proposal.
-5. **Update to 'Quote Sent':** Mark the quote as sent to client.
-6. **Mark Request Confirmed:** Click "Mark as Confirmed" to convert into Order `ORD-2026-104`.
-7. **Verify Event:** Find the confirmed event immediately active on both the **Orders** page and the **Calendar**.
+### 3. Individual Product Detail Pages
+- Large image gallery with thumbnail navigation and primary interactive view.
+- Category, collection, and SKU identifiers.
+- Editorial description and craftsmanship story explaining the heritage and hours of labor.
+- Clickable color swatches with active selection.
+- Detailed specifications accordion (Dimensions, Material composition, Craftsmanship technique, Care guidelines, Lead times).
+- Prominent **"Enquire About This Product"** CTA button (automatically populates the product name into the enquiry form).
+- Curated Companions / Related Products grid.
+
+### 4. Direct Email Enquiry System (`suhaib.ishrat36@gmail.com`)
+All inquiries from across the website are targeted to:
+**`suhaib.ishrat36@gmail.com`**
+
+- **Enquiry Form Fields**:
+  - Full Name (required)
+  - Email Address (required, validated)
+  - Phone Number (for WhatsApp concierge)
+  - Product Name (pre-populated automatically)
+  - Enquiry Type (Availability, Custom Dimensions, Swatches, Trade / Hospitality, Private Appointment)
+  - Message (required)
+  - Anti-spam Honeypot protection
+- **Integration Options**:
+  - **Web3Forms**: Connects to `https://api.web3forms.com/submit` to deliver submissions straight to `suhaib.ishrat36@gmail.com`.
+  - **Formspree**: Alternative endpoint configuration.
+  - **Client-Side Validation & Feedback**: Real-time validation, loading spinner, clear success confirmation, and transparent configuration guidance.
+
+### 5. Curated Shortlist / Personal Lookbook
+- Visitors can bookmark any creation while browsing.
+- Slide-out shortlist drawer displays saved creations.
+- Single-click **"Enquire About Entire Shortlist"** compiles all selected items into a single consolidated enquiry sent to `suhaib.ishrat36@gmail.com`.
+
+### 6. Contact & Flagship Boutiques Page
+- General enquiry form.
+- Flagship Showroom directory:
+  - New Delhi Flagship (Khan Market)
+  - New Delhi Heritage Studio (Sultanpur, MG Road)
+  - Mumbai Boutique (Colaba)
+  - Bengaluru Studio (Lavelle Road)
+- Direct phone lines, email contact, operating hours, and private appointments.
 
 ---
 
-## 4. Technical Architecture
+## 🛠️ Configuration: Live Email Delivery
 
-* **Frontend Framework:** React 19 + Vite 6
-* **Icons:** Lucide React
-* **Styling:** Custom CSS design system with CSS custom properties (`--hm-primary: #8F1D1D`, `--hm-amber: #D97706`, `--hm-charcoal: #1C1917`), responsive breakpoints, and print stylesheets
-* **Data Layer:** Pure client-side state with `localStorage` persistence and a **"Reset Data"** button to restore clean sample data anytime
-* **Zero Backend Requirements:** Fully self-contained prototype suitable for offline pitching, static hosting, or demo presentation
+To activate instant live email delivery to **`suhaib.ishrat36@gmail.com`**:
+
+1. Go to [https://web3forms.com](https://web3forms.com) (free, no sign-up password required).
+2. Enter the destination email: **`suhaib.ishrat36@gmail.com`**.
+3. Copy the access key you receive in your inbox.
+4. Add the key to your `.env` file:
+   ```env
+   VITE_WEB3FORMS_ACCESS_KEY=your_access_key_here
+   ```
+5. Restart or reload your development server. All form submissions from the website will now be delivered live to `suhaib.ishrat36@gmail.com`!
 
 ---
 
-## 5. Development & Build
+## 💻 Tech Stack
 
-### Running Locally
+- **React 19**
+- **Tailwind CSS v4** (with `@tailwindcss/vite`)
+- **Vite 6**
+- **Lucide React** (luxury minimalist iconography)
+- **Google Fonts** (*Cormorant Garamond*, *Plus Jakarta Sans*, *Cinzel*)
+
+---
+
+## 🚀 Getting Started
 
 ```bash
-# Start Vite development server
+# 1. Install dependencies
+npm install
+
+# 2. Start development server
 npm run dev
-```
 
-### Production Build
-
-```bash
-# Compile optimized production bundle
+# 3. Build for production
 npm run build
-
-# Preview production build
-npm run preview
 ```
