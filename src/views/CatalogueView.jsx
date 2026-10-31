@@ -127,7 +127,7 @@ export default function CatalogueView({
       }
       return 0;
     });
-  }, [selectedCategory, selectedCollection, selectedColor, selectedMaterial, searchQuery, sortBy]);
+  }, [activeProducts, selectedCategory, selectedCollection, selectedColor, selectedMaterial, searchQuery, sortBy]);
 
   // Clear all filters handler
   const handleClearAll = () => {

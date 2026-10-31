@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import EnquiryModal from './components/EnquiryModal';
@@ -75,24 +75,40 @@ export default function App() {
     }
   }, [shortlist]);
 
-  // Fetch dynamic public catalogue data from Supabase on mount
-  useEffect(() => {
-    async function loadCatalog() {
-      try {
-        const [prods, cats, cols] = await Promise.all([
-          getPublicProducts(),
-          getPublicCategories(),
-          getPublicCollections(),
-        ]);
-        if (prods && prods.length > 0) setProducts(prods);
-        if (cats && cats.length > 0) setCategories(cats);
-        if (cols && cols.length > 0) setCollections(cols);
-      } catch (err) {
-        console.info('Catalogue running on local seed data:', err.message);
-      }
+  // Fetch dynamic public catalogue data from Supabase
+  const reloadCatalog = useCallback(async () => {
+    try {
+      const [prods, cats, cols] = await Promise.all([
+        getPublicProducts(),
+        getPublicCategories(),
+        getPublicCollections(),
+      ]);
+      if (prods && prods.length > 0) setProducts(prods);
+      if (cats && cats.length > 0) setCategories(cats);
+      if (cols && cols.length > 0) setCollections(cols);
+    } catch (err) {
+      console.info('Catalogue running on local seed data:', err.message);
     }
-    loadCatalog();
   }, []);
+
+  useEffect(() => {
+    reloadCatalog();
+  }, [reloadCatalog]);
+
+  // Auto-refresh catalogue whenever returning to window or tab
+  useEffect(() => {
+    const handleSync = () => {
+      if (document.visibilityState === 'visible') {
+        reloadCatalog();
+      }
+    };
+    window.addEventListener('visibilitychange', handleSync);
+    window.addEventListener('focus', handleSync);
+    return () => {
+      window.removeEventListener('visibilitychange', handleSync);
+      window.removeEventListener('focus', handleSync);
+    };
+  }, [reloadCatalog]);
 
   // Listen to browser popstate for URL synchronization
   useEffect(() => {
@@ -138,6 +154,7 @@ export default function App() {
 
     if (currentView === 'admin' && view !== 'admin') {
       window.history.pushState(null, '', '/');
+      reloadCatalog();
     }
 
     if (view === 'product-detail' && param) {
