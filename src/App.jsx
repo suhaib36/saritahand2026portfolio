@@ -13,12 +13,40 @@ import CollectionsView from './views/CollectionsView';
 import CraftsmanshipView from './views/CraftsmanshipView';
 import ContactView from './views/ContactView';
 
+// Admin imports
+import { AdminAuthProvider } from './admin/context/AdminAuthContext';
+import AdminDashboard from './admin/AdminDashboard';
+
+// Data services
 import { PRODUCTS_DATA } from './data/productsData';
+import { CATEGORIES_DATA } from './data/categoriesData';
+import { COLLECTIONS_DATA } from './data/collectionsData';
+import {
+  getPublicProducts,
+  getPublicCategories,
+  getPublicCollections,
+} from './services/catalogService';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('home');
+  // Check if initial URL is /admin
+  const getInitialView = () => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      if (path === '/admin' || path.startsWith('/admin/') || window.location.hash.includes('admin')) {
+        return 'admin';
+      }
+    }
+    return 'home';
+  };
+
+  const [currentView, setCurrentView] = useState(getInitialView);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [catalogueFilters, setCatalogueFilters] = useState({});
+
+  // Dynamic Catalog Data (fetched from Supabase with instant fallback to local data)
+  const [products, setProducts] = useState(PRODUCTS_DATA);
+  const [categories, setCategories] = useState(CATEGORIES_DATA);
+  const [collections, setCollections] = useState(COLLECTIONS_DATA);
 
   // Modals & Drawers state
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
@@ -47,6 +75,39 @@ export default function App() {
     }
   }, [shortlist]);
 
+  // Fetch dynamic public catalogue data from Supabase on mount
+  useEffect(() => {
+    async function loadCatalog() {
+      try {
+        const [prods, cats, cols] = await Promise.all([
+          getPublicProducts(),
+          getPublicCategories(),
+          getPublicCollections(),
+        ]);
+        if (prods && prods.length > 0) setProducts(prods);
+        if (cats && cats.length > 0) setCategories(cats);
+        if (cols && cols.length > 0) setCollections(cols);
+      } catch (err) {
+        console.info('Catalogue running on local seed data:', err.message);
+      }
+    }
+    loadCatalog();
+  }, []);
+
+  // Listen to browser popstate for URL synchronization
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      if (path === '/admin' || path.startsWith('/admin/')) {
+        setCurrentView('admin');
+      } else if (currentView === 'admin') {
+        setCurrentView('home');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentView]);
+
   // Dynamic document title
   useEffect(() => {
     const titles = {
@@ -58,13 +119,26 @@ export default function App() {
       collections: 'Signature Collections Lookbook | Sarita Handa',
       about: 'The Art of the Needle & Heritage Craftsmanship | Sarita Handa',
       contact: 'Flagship Showrooms & Client Concierge | Sarita Handa',
+      admin: 'Sarita Handa | Admin & Management Portal',
     };
     document.title = titles[currentView] || 'Sarita Handa | Luxury Living';
   }, [currentView, selectedProduct]);
 
-  // Scroll to top on view change
+  // Navigation handler
   const navigateTo = (view, param = null) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (view === 'admin') {
+      if (window.location.pathname !== '/admin') {
+        window.history.pushState(null, '', '/admin');
+      }
+      setCurrentView('admin');
+      return;
+    }
+
+    if (currentView === 'admin' && view !== 'admin') {
+      window.history.pushState(null, '', '/');
+    }
 
     if (view === 'product-detail' && param) {
       setSelectedProduct(param);
@@ -142,110 +216,125 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-stone-900 selection:bg-[#C5A880]/30 selection:text-stone-900 font-sans">
-      {/* Global Navigation Bar */}
-      <Navbar
-        currentView={currentView}
-        onNavigate={navigateTo}
-        shortlistCount={shortlist.length}
-        onOpenShortlist={() => setShortlistDrawerOpen(true)}
-        onOpenSearch={() => setSearchModalOpen(true)}
-        onOpenEnquiry={handleOpenGeneralEnquiry}
-      />
-
-      {/* Main Content Area */}
-      <main className="flex-1">
-        {currentView === 'home' && (
-          <HomeView
+    <AdminAuthProvider>
+      {currentView === 'admin' ? (
+        <AdminDashboard onNavigateHome={() => navigateTo('home')} />
+      ) : (
+        <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-stone-900 selection:bg-[#C5A880]/30 selection:text-stone-900 font-sans">
+          {/* Global Navigation Bar */}
+          <Navbar
+            currentView={currentView}
             onNavigate={navigateTo}
-            onViewProduct={(p) => navigateTo('product-detail', p)}
-            onEnquireProduct={handleOpenProductEnquiry}
+            shortlistCount={shortlist.length}
+            onOpenShortlist={() => setShortlistDrawerOpen(true)}
+            onOpenSearch={() => setSearchModalOpen(true)}
+            onOpenEnquiry={handleOpenGeneralEnquiry}
+          />
+
+          {/* Main Content Area */}
+          <main className="flex-1">
+            {currentView === 'home' && (
+              <HomeView
+                products={products}
+                categories={categories}
+                collections={collections}
+                onNavigate={navigateTo}
+                onViewProduct={(p) => navigateTo('product-detail', p)}
+                onEnquireProduct={handleOpenProductEnquiry}
+                shortlist={shortlist}
+                onToggleShortlist={handleToggleShortlist}
+              />
+            )}
+
+            {currentView === 'catalogue' && (
+              <CatalogueView
+                products={products}
+                categories={categories}
+                collections={collections}
+                initialFilters={catalogueFilters}
+                onNavigate={navigateTo}
+                onViewProduct={(p) => navigateTo('product-detail', p)}
+                onEnquireProduct={handleOpenProductEnquiry}
+                shortlist={shortlist}
+                onToggleShortlist={handleToggleShortlist}
+              />
+            )}
+
+            {currentView === 'product-detail' && (
+              <ProductDetailView
+                product={selectedProduct || products[0] || PRODUCTS_DATA[0]}
+                products={products}
+                onNavigate={navigateTo}
+                onViewProduct={(p) => navigateTo('product-detail', p)}
+                onEnquireProduct={handleOpenProductEnquiry}
+                shortlist={shortlist}
+                onToggleShortlist={handleToggleShortlist}
+                onShowToast={showToast}
+              />
+            )}
+
+            {currentView === 'collections' && (
+              <CollectionsView
+                collections={collections}
+                products={products}
+                onNavigate={navigateTo}
+                onEnquire={(item) => handleOpenProductEnquiry(item)}
+              />
+            )}
+
+            {currentView === 'about' && (
+              <CraftsmanshipView
+                onNavigate={navigateTo}
+                onEnquire={(item) => handleOpenProductEnquiry(item)}
+              />
+            )}
+
+            {currentView === 'contact' && (
+              <ContactView
+                onNavigate={navigateTo}
+                onShowToast={showToast}
+              />
+            )}
+          </main>
+
+          {/* Global Luxury Footer */}
+          <Footer
+            onNavigate={navigateTo}
+            onOpenEnquiry={handleOpenGeneralEnquiry}
+          />
+
+          {/* Enquiry Modal */}
+          <EnquiryModal
+            isOpen={enquiryModalOpen}
+            onClose={() => setEnquiryModalOpen(false)}
+            product={enquiryTargetProduct}
+            shortlist={enquiryTargetShortlist}
+          />
+
+          {/* Curated Shortlist Drawer */}
+          <ShortlistDrawer
+            isOpen={shortlistDrawerOpen}
+            onClose={() => setShortlistDrawerOpen(false)}
             shortlist={shortlist}
-            onToggleShortlist={handleToggleShortlist}
-          />
-        )}
-
-        {currentView === 'catalogue' && (
-          <CatalogueView
-            initialFilters={catalogueFilters}
-            onNavigate={navigateTo}
+            onRemoveItem={handleRemoveFromShortlist}
+            onClearAll={handleClearShortlist}
             onViewProduct={(p) => navigateTo('product-detail', p)}
-            onEnquireProduct={handleOpenProductEnquiry}
-            shortlist={shortlist}
-            onToggleShortlist={handleToggleShortlist}
+            onEnquireAll={handleOpenShortlistEnquiry}
           />
-        )}
 
-        {currentView === 'product-detail' && (
-          <ProductDetailView
-            product={selectedProduct || PRODUCTS_DATA[0]}
-            onNavigate={navigateTo}
-            onViewProduct={(p) => navigateTo('product-detail', p)}
-            onEnquireProduct={handleOpenProductEnquiry}
-            shortlist={shortlist}
-            onToggleShortlist={handleToggleShortlist}
-            onShowToast={showToast}
+          {/* Quick Search Modal */}
+          <QuickSearchModal
+            isOpen={searchModalOpen}
+            onClose={() => setSearchModalOpen(false)}
+            products={products}
+            onSelectProduct={(p) => navigateTo('product-detail', p)}
+            onViewAllResults={(query) => navigateTo('catalogue', { query })}
           />
-        )}
 
-        {currentView === 'collections' && (
-          <CollectionsView
-            onNavigate={navigateTo}
-            onEnquire={(item) => handleOpenProductEnquiry(item)}
-          />
-        )}
-
-        {currentView === 'about' && (
-          <CraftsmanshipView
-            onNavigate={navigateTo}
-            onEnquire={(item) => handleOpenProductEnquiry(item)}
-          />
-        )}
-
-        {currentView === 'contact' && (
-          <ContactView
-            onNavigate={navigateTo}
-            onShowToast={showToast}
-          />
-        )}
-      </main>
-
-      {/* Global Luxury Footer */}
-      <Footer
-        onNavigate={navigateTo}
-        onOpenEnquiry={handleOpenGeneralEnquiry}
-      />
-
-      {/* Enquiry Modal */}
-      <EnquiryModal
-        isOpen={enquiryModalOpen}
-        onClose={() => setEnquiryModalOpen(false)}
-        product={enquiryTargetProduct}
-        shortlist={enquiryTargetShortlist}
-      />
-
-      {/* Curated Shortlist Drawer */}
-      <ShortlistDrawer
-        isOpen={shortlistDrawerOpen}
-        onClose={() => setShortlistDrawerOpen(false)}
-        shortlist={shortlist}
-        onRemoveItem={handleRemoveFromShortlist}
-        onClearAll={handleClearShortlist}
-        onViewProduct={(p) => navigateTo('product-detail', p)}
-        onEnquireAll={handleOpenShortlistEnquiry}
-      />
-
-      {/* Quick Search Modal */}
-      <QuickSearchModal
-        isOpen={searchModalOpen}
-        onClose={() => setSearchModalOpen(false)}
-        products={PRODUCTS_DATA}
-        onSelectProduct={(p) => navigateTo('product-detail', p)}
-        onViewAllResults={(query) => navigateTo('catalogue', { query })}
-      />
-
-      {/* Global Toast */}
-      <Toast toast={toast} onClose={() => setToast(null)} />
-    </div>
+          {/* Global Toast */}
+          <Toast toast={toast} onClose={() => setToast(null)} />
+        </div>
+      )}
+    </AdminAuthProvider>
   );
 }

@@ -18,6 +18,7 @@ import { ENQUIRY_CONFIG } from '../config/enquiryConfig';
 
 export default function ProductDetailView({
   product,
+  products = PRODUCTS_DATA,
   onNavigate,
   onViewProduct,
   onEnquireProduct,
@@ -36,10 +37,11 @@ export default function ProductDetailView({
   const isShortlisted = shortlist.some((item) => item.id === product.id);
 
   // Related products (same category or collection, excluding current)
-  const relatedProducts = PRODUCTS_DATA.filter(
+  const activeProducts = products && products.length > 0 ? products : PRODUCTS_DATA;
+  const relatedProducts = activeProducts.filter(
     (p) =>
       p.id !== product.id &&
-      (p.categoryId === product.categoryId || p.collectionId === product.collectionId)
+      (p.categoryId === product.categoryId || p.category === product.category || p.collectionId === product.collectionId)
   ).slice(0, 4);
 
   const handleShare = () => {

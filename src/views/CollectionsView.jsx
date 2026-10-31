@@ -4,7 +4,15 @@ import Breadcrumb from '../components/Breadcrumb';
 import { COLLECTIONS_DATA } from '../data/collectionsData';
 import { PRODUCTS_DATA } from '../data/productsData';
 
-export default function CollectionsView({ onNavigate, onEnquire }) {
+export default function CollectionsView({
+  collections = COLLECTIONS_DATA,
+  products = PRODUCTS_DATA,
+  onNavigate,
+  onEnquire,
+}) {
+  const activeCollections = collections && collections.length > 0 ? collections : COLLECTIONS_DATA;
+  const activeProducts = products && products.length > 0 ? products : PRODUCTS_DATA;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
       <Breadcrumb
@@ -28,9 +36,9 @@ export default function CollectionsView({ onNavigate, onEnquire }) {
 
       {/* Collections Lookbook Stack */}
       <div className="space-y-20">
-        {COLLECTIONS_DATA.map((col, index) => {
+        {activeCollections.map((col, index) => {
           const isEven = index % 2 === 0;
-          const colProducts = PRODUCTS_DATA.filter((p) => p.collectionId === col.id);
+          const colProducts = activeProducts.filter((p) => p.collectionId === col.id || p.collection === col.name);
 
           return (
             <section

@@ -7,6 +7,9 @@ import { CATEGORIES_DATA } from '../data/categoriesData';
 import { COLLECTIONS_DATA } from '../data/collectionsData';
 
 export default function CatalogueView({
+  products = PRODUCTS_DATA,
+  categories = CATEGORIES_DATA,
+  collections = COLLECTIONS_DATA,
   initialFilters = {},
   onNavigate,
   onViewProduct,
@@ -14,6 +17,10 @@ export default function CatalogueView({
   shortlist = [],
   onToggleShortlist,
 }) {
+  const activeProducts = products && products.length > 0 ? products : PRODUCTS_DATA;
+  const activeCategories = categories && categories.length > 0 ? categories : CATEGORIES_DATA;
+  const activeCollections = collections && collections.length > 0 ? collections : COLLECTIONS_DATA;
+
   // State for all filters
   const [selectedCategory, setSelectedCategory] = useState(initialFilters.category || 'All');
   const [selectedCollection, setSelectedCollection] = useState(initialFilters.collection || 'All');
@@ -30,13 +37,13 @@ export default function CatalogueView({
     }
     if (initialFilters.collection) {
       // Find collection id or name
-      const matched = COLLECTIONS_DATA.find((c) => c.id === initialFilters.collection || c.name === initialFilters.collection);
+      const matched = activeCollections.find((c) => c.id === initialFilters.collection || c.name === initialFilters.collection);
       if (matched) setSelectedCollection(matched.name);
     }
     if (initialFilters.query) {
       setSearchQuery(initialFilters.query);
     }
-  }, [initialFilters]);
+  }, [initialFilters, activeCollections]);
 
   // Derived filter options
   const colorOptions = [
@@ -63,7 +70,7 @@ export default function CatalogueView({
 
   // Filtering logic
   const filteredProducts = useMemo(() => {
-    return PRODUCTS_DATA.filter((product) => {
+    return activeProducts.filter((product) => {
       // Category filter
       if (selectedCategory !== 'All' && product.category !== selectedCategory) {
         return false;
@@ -71,7 +78,7 @@ export default function CatalogueView({
 
       // Collection filter
       if (selectedCollection !== 'All') {
-        const matchedCol = COLLECTIONS_DATA.find(
+        const matchedCol = activeCollections.find(
           (c) => c.name === selectedCollection || c.id === selectedCollection
         );
         if (matchedCol && product.collectionId !== matchedCol.id && product.collection !== selectedCollection) {
@@ -175,10 +182,10 @@ export default function CatalogueView({
                 : 'bg-white border border-[#E8DED0] text-stone-700 hover:border-stone-400'
             }`}
           >
-            All Categories ({PRODUCTS_DATA.length})
+            All Categories ({activeProducts.length})
           </button>
-          {CATEGORIES_DATA.map((cat) => {
-            const count = PRODUCTS_DATA.filter((p) => p.category === cat.name).length;
+          {activeCategories.map((cat) => {
+            const count = activeProducts.filter((p) => p.category === cat.name).length;
             const isSelected = selectedCategory === cat.name;
             return (
               <button
@@ -284,7 +291,7 @@ export default function CatalogueView({
               className="w-full p-2 bg-[#FAF8F5] border border-[#E8DED0] text-xs font-sans text-stone-800 focus:outline-hidden focus:border-[#C5A880]"
             >
               <option value="All">All Collections</option>
-              {COLLECTIONS_DATA.map((col) => (
+              {activeCollections.map((col) => (
                 <option key={col.id} value={col.name}>
                   {col.name}
                 </option>
@@ -478,7 +485,7 @@ export default function CatalogueView({
                 className="w-full p-2 bg-white border border-[#E8DED0] text-xs font-sans text-stone-800"
               >
                 <option value="All">All Collections</option>
-                {COLLECTIONS_DATA.map((col) => (
+                {activeCollections.map((col) => (
                   <option key={col.id} value={col.name}>
                     {col.name}
                   </option>

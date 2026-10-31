@@ -1,6 +1,6 @@
-# Sarita Handa – Luxury Product Portfolio & Design Concierge
+# Sarita Handa – Luxury Product Portfolio & Admin Management Portal
 
-A premium, modern luxury product portfolio website for **Sarita Handa** (inspired by [saritahanda.com](https://saritahanda.com/)), celebrating over 30 years of master Indian needlecraft, heritage textiles, European washed flax linens, and handcrafted teak furniture.
+A premium, modern luxury product portfolio website and full administrative management system for **Sarita Handa** (inspired by [saritahanda.com](https://saritahanda.com/)), celebrating over 30 years of master Indian needlecraft, heritage textiles, European washed flax linens, and handcrafted teak furniture.
 
 ---
 
@@ -12,104 +12,73 @@ A premium, modern luxury product portfolio website for **Sarita Handa** (inspire
 
 ---
 
-## ✨ Key Features
+## 🛡️ Admin Dashboard (`/admin`)
+
+The private management portal is accessible at **`/admin`** (or via the discreet "Portal Access" link in the footer).
+
+### 1. Secure Authentication
+- **Supabase Auth Integration**: Email and password authentication with encrypted sessions.
+- **Protected Routes**: Public visitors cannot access dashboard sections or register themselves.
+- **First Time Admin Setup**: Create an authorized user in your Supabase Dashboard under **Authentication -> Users -> Add User** (e.g. `suhaib.ishrat36@gmail.com`).
+
+### 2. Dashboard Overview
+- Real-time statistics from Supabase:
+  - **Total Products** (Published vs. Draft count)
+  - **Total Categories** & **Total Collections**
+  - **Total Enquiries** & **New Unprocessed Leads**
+- Quick Actions to add products or view customer enquiries.
+- Recent activity tables for products and leads.
+
+### 3. Product Management (Full CRUD)
+- **Add & Edit Products**: Name, slug, SKU, category, collection, materials, colors, dimensions, craftsmanship technique, care guidelines, and pricing.
+- **Supabase Storage Image Management**: Multiple image upload with thumbnail preview, delete, and set cover ordering.
+- **Publish / Draft Toggle**: Control visibility on public site with 1 click.
+- **Featured Toggle**: Highlight icons on homepage.
+- **Delete Safeguards**: Confirmation modal before permanently deleting.
+
+### 4. Category & Collection Management
+- Add, edit, and toggle active status for categories.
+- Curate lookbook collections with season titles, poetic quotes, and banner imagery.
+- Automatically updates public website navigation and filter pills in real time.
+
+### 5. Client Enquiry Management
+- View every customer submission from the public portfolio in real time.
+- Status workflow: **New**, **Contacted**, **In Progress**, **Completed**.
+- Instant mailto / tel links to reply to customers immediately.
+- Filter, search, and manage customer notes.
+
+---
+
+## ✨ Public Portfolio Features
 
 ### 1. Editorial Homepage
-- **Full-Width Hero Section**: Dynamic showcase with luxury carousel highlighting seasonal collections (*The Autumn Atelier*, *Heritage Suzani Heirlooms*, *Artisanal Teak & Cane*).
-- **Brand Introduction & Heritage Pillars**: Honoring craft preservation, pure natural fibres, and bespoke residential concierge.
-- **Featured Product Collections**: Visual lookbook cards directing visitors to curated thematic lines.
-- **Popular Categories**: Direct visual access to all 9 product categories.
-- **Curated Featured Products Grid**: Best-sellers with interactive hover effects, badges, quick view, and enquire shortcuts.
-- **"Living with Sarita Handa"**: Editorial magazine vignettes showing styled interior spaces.
-- **The Art of the Needle**: Educational section on signature techniques (*The French Knot*, *Kashmiri Aari Hook*, *Kantha Running Stitch*, *Suzani Rosettes*).
-- **Bespoke Enquiry Call-to-Action**: High-visibility invitation to collaborate with the design concierge.
-- **Premium Footer**: Complete showroom directory, direct concierge contact, and brand manifesto.
+- Full-width hero carousel with seasonal looks (*The Autumn Atelier*, *Heritage Suzani*, *Artisanal Teak*).
+- Brand heritage pillars, popular categories grid, featured creations, and *"Living with Sarita Handa"* lifestyle section.
+- Needlework philosophy (*French Knot*, *Kashmiri Aari Hook*, *Kantha Running Stitch*, *Suzani Medallions*).
 
-### 2. Complete Product Catalogue & Instant Filtering
-- **9 Core Categories**:
-  1. Cushions (French knot medallions, Aari crewelwork, silk velvet)
-  2. Bed Linen (Vintage washed European flax, 500 TC Giza Egyptian cotton)
-  3. Quilts (Reversible Suzani heirlooms, hand-block Kantha coverlets)
-  4. Duvet Covers (Scalloped border linens, architectural matelassé)
-  5. Table Linen (Embroidered runners, scalloped napkin sets)
-  6. Drapes (Gossamer linen sheers, heavy blackout velvet curtains)
-  7. Furniture (Solid Teak & handwoven cane chairs, fluted Sheesham credenzas)
-  8. Home Accessories (Hand-carved alabaster vessels, sand-cast brass candelabras)
-  9. Kids' Collection (GOTS-certified organic cotton nursery cushions & cot quilts)
-- **Instant Frontend Filtering & Search**:
-  - Filter by Category
-  - Filter by Collection
-  - Filter by Color Palette (with visual swatch dots)
-  - Filter by Material (Flax Linen, Cotton, Velvet, Wool, Teak, Stone)
-  - Live Search by product name, fabric, or technique
-  - Sorting by Featured, Newest, Name (A–Z), Name (Z–A)
-  - Active filter badges with one-click individual dismissal & "Clear All"
-  - Responsive mobile filter drawer
+### 2. Dynamic Product Catalogue
+- 9 Core Categories: Cushions, Bed Linen, Quilts, Duvet Covers, Table Linen, Drapes, Furniture, Home Accessories, Kids' Collection.
+- Instant frontend filters (Category, Collection, Colour, Material), search, and sorting.
+- Real-time database integration with automatic fallback to local seed data.
 
-### 3. Individual Product Detail Pages
-- Large image gallery with thumbnail navigation and primary interactive view.
-- Category, collection, and SKU identifiers.
-- Editorial description and craftsmanship story explaining the heritage and hours of labor.
-- Clickable color swatches with active selection.
-- Detailed specifications accordion (Dimensions, Material composition, Craftsmanship technique, Care guidelines, Lead times).
-- Prominent **"Enquire About This Product"** CTA button (automatically populates the product name into the enquiry form).
-- Curated Companions / Related Products grid.
+### 3. Individual Product Pages
+- High-res galleries, dimensions, materials, care guides, and related creations.
+- One-click **"Enquire About This Product"** button auto-populating the form.
 
-### 4. Direct Email Enquiry System (`suhaib.ishrat36@gmail.com`)
-All inquiries from across the website are targeted to:
-**`suhaib.ishrat36@gmail.com`**
-
-- **Enquiry Form Fields**:
-  - Full Name (required)
-  - Email Address (required, validated)
-  - Phone Number (for WhatsApp concierge)
-  - Product Name (pre-populated automatically)
-  - Enquiry Type (Availability, Custom Dimensions, Swatches, Trade / Hospitality, Private Appointment)
-  - Message (required)
-  - Anti-spam Honeypot protection
-- **Integration Options**:
-  - **Web3Forms**: Connects to `https://api.web3forms.com/submit` to deliver submissions straight to `suhaib.ishrat36@gmail.com`.
-  - **Formspree**: Alternative endpoint configuration.
-  - **Client-Side Validation & Feedback**: Real-time validation, loading spinner, clear success confirmation, and transparent configuration guidance.
-
-### 5. Curated Shortlist / Personal Lookbook
-- Visitors can bookmark any creation while browsing.
-- Slide-out shortlist drawer displays saved creations.
-- Single-click **"Enquire About Entire Shortlist"** compiles all selected items into a single consolidated enquiry sent to `suhaib.ishrat36@gmail.com`.
-
-### 6. Contact & Flagship Boutiques Page
-- General enquiry form.
-- Flagship Showroom directory:
-  - New Delhi Flagship (Khan Market)
-  - New Delhi Heritage Studio (Sultanpur, MG Road)
-  - Mumbai Boutique (Colaba)
-  - Bengaluru Studio (Lavelle Road)
-- Direct phone lines, email contact, operating hours, and private appointments.
+### 4. Curated Shortlist / Personal Lookbook
+- Bookmark favorite pieces into a slide-out drawer.
+- Single-click consolidated inquiry for all shortlisted items.
 
 ---
 
-## 🛠️ Configuration: Live Email Delivery
+## ⚙️ Supabase Database Schema
 
-To activate instant live email delivery to **`suhaib.ishrat36@gmail.com`**:
+The database schema is located at **`supabase/schema.sql`** and **`supabase/admin_dashboard_schema.sql`**.
 
-1. Go to [https://web3forms.com](https://web3forms.com) (free, no sign-up password required).
-2. Enter the destination email: **`suhaib.ishrat36@gmail.com`**.
-3. Copy the access key you receive in your inbox.
-4. Add the key to your `.env` file:
-   ```env
-   VITE_WEB3FORMS_ACCESS_KEY=your_access_key_here
-   ```
-5. Restart or reload your development server. All form submissions from the website will now be delivered live to `suhaib.ishrat36@gmail.com`!
-
----
-
-## 💻 Tech Stack
-
-- **React 19**
-- **Tailwind CSS v4** (with `@tailwindcss/vite`)
-- **Vite 6**
-- **Lucide React** (luxury minimalist iconography)
-- **Google Fonts** (*Cormorant Garamond*, *Plus Jakarta Sans*, *Cinzel*)
+Run it in your **Supabase Dashboard -> SQL Editor -> New Query -> Run**:
+- Creates `products`, `categories`, `collections`, `enquiries`, `admin_users` tables.
+- Sets up Row Level Security (RLS) policies.
+- Creates `product-images` storage bucket with public read and authenticated write permissions.
 
 ---
 
@@ -119,9 +88,9 @@ To activate instant live email delivery to **`suhaib.ishrat36@gmail.com`**:
 # 1. Install dependencies
 npm install
 
-# 2. Start development server
+# 2. Run local development server
 npm run dev
 
-# 3. Build for production
+# 3. Build for production (Vercel-ready with vercel.json rewrite)
 npm run build
 ```

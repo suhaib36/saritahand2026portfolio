@@ -83,15 +83,22 @@ export async function submitEnquiry(data) {
         .from('enquiries')
         .insert([
           {
+            customer_name: payload.fullName,
             full_name: payload.fullName,
+            customer_email: payload.email,
             email: payload.email,
+            customer_phone: payload.phone,
             phone: payload.phone,
+            product_id: data.productId || null,
             product_name: payload.productName,
+            product_image: data.productImage || null,
             category: payload.category,
             enquiry_type: payload.enquiryType,
+            quantity: payload.quantity,
             message: payload.message,
             shortlist: payload.shortlist,
             status: 'new',
+            updated_at: payload.submittedAt,
           },
         ]);
       if (dbError) {

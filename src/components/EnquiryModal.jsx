@@ -81,6 +81,8 @@ export default function EnquiryModal({
     try {
       const response = await submitEnquiry({
         ...formData,
+        productId: product?.id || null,
+        productImage: product?.images?.[0] || null,
         shortlist: shortlist || null,
       });
 

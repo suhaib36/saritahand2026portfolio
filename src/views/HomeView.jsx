@@ -8,6 +8,9 @@ import { BRAND_DATA } from '../data/brandData';
 import { ENQUIRY_CONFIG } from '../config/enquiryConfig';
 
 export default function HomeView({
+  products = PRODUCTS_DATA,
+  categories = CATEGORIES_DATA,
+  collections = COLLECTIONS_DATA,
   onNavigate,
   onViewProduct,
   onEnquireProduct,
@@ -52,7 +55,11 @@ export default function HomeView({
     return () => clearInterval(timer);
   }, [heroSlides.length]);
 
-  const featuredProducts = PRODUCTS_DATA.filter((p) => p.featured).slice(0, 8);
+  const activeProducts = products && products.length > 0 ? products : PRODUCTS_DATA;
+  const activeCollections = collections && collections.length > 0 ? collections : COLLECTIONS_DATA;
+  const activeCategories = categories && categories.length > 0 ? categories : CATEGORIES_DATA;
+
+  const featuredProducts = activeProducts.filter((p) => p.featured).slice(0, 8);
 
   return (
     <div className="space-y-20 md:space-y-28 pb-16">
@@ -210,7 +217,7 @@ export default function HomeView({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {COLLECTIONS_DATA.slice(0, 3).map((col) => (
+            {activeCollections.slice(0, 3).map((col) => (
               <div
                 key={col.id}
                 onClick={() => onNavigate('catalogue', { collection: col.id })}
@@ -265,7 +272,7 @@ export default function HomeView({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {CATEGORIES_DATA.map((cat) => (
+          {activeCategories.map((cat) => (
             <div
               key={cat.id}
               onClick={() => onNavigate('catalogue', { category: cat.name })}

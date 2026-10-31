@@ -174,6 +174,13 @@ export default function Footer({ onNavigate, onOpenEnquiry }) {
             <span className="text-stone-400">Handcrafted in India</span>
             <span>•</span>
             <span className="text-stone-400">All Enquiries: {ENQUIRY_CONFIG.destinationEmail}</span>
+            <span>•</span>
+            <button
+              onClick={() => onNavigate('admin')}
+              className="text-stone-500 hover:text-[#C5A880] transition-colors uppercase tracking-wider text-[10px]"
+            >
+              Portal Access
+            </button>
           </div>
         </div>
       </div>
