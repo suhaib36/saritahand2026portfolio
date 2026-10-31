@@ -1,4 +1,5 @@
 import { ENQUIRY_CONFIG } from '../config/enquiryConfig';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 /**
  * Validates enquiry input fields
@@ -75,7 +76,35 @@ export async function submitEnquiry(data) {
     submittedAt: new Date().toISOString(),
   };
 
-  // Step 2: Live submission if API credentials are provided
+  // Step 2A: Store enquiry into Supabase database if configured
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { error: dbError } = await supabase
+        .from('enquiries')
+        .insert([
+          {
+            full_name: payload.fullName,
+            email: payload.email,
+            phone: payload.phone,
+            product_name: payload.productName,
+            category: payload.category,
+            enquiry_type: payload.enquiryType,
+            message: payload.message,
+            shortlist: payload.shortlist,
+            status: 'new',
+          },
+        ]);
+      if (dbError) {
+        console.warn('Supabase enquiry record warning:', dbError.message);
+      } else {
+        console.info('Enquiry persisted into Supabase enquiries table.');
+      }
+    } catch (dbErr) {
+      console.warn('Supabase service error:', dbErr.message);
+    }
+  }
+
+  // Step 2B: Live email dispatch if Web3Forms is provided
   if (ENQUIRY_CONFIG.web3formsKey) {
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
